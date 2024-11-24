@@ -1,0 +1,103 @@
+api-version: '1.21'
+authors: [OoLunar]
+description: A Paper/Folia TPA plugin
+folia-supported: true
+main: com.four_year_smp.four_tpa.FourTpaPlugin
+name: 4TPA
+prefix: 4TPA
+version: 1.0.0
+website: https://github.com/OoLunar/4TPA
+
+permissions:
+  fourtpa.back:
+    default: true
+    description: Allows the player to use the /back command
+  fourtpa.reload:
+    default: op
+    description: Allows the player to use the /tpareload command
+  fourtpa.tpa:
+    default: true
+    description: Allows the player to use the /tpa command
+  fourtpa.tpaccept:
+    default: true
+    description: Allows the player to use the /tpaccept command
+  fourtpa.tpacceptall:
+    default: true
+    description: Allows the player to use the /tpacceptall command
+  fourtpa.tpahere:
+    default: true
+    description: Allows the player to use the /tpahere command
+  fourtpa.tpaoffline:
+    default: op
+    description: Allows the player to use the /tpaoffline command
+  fourtpa.tpcancel:
+    default: true
+    description: Allows the player to use the /tpacancel command
+  fourtpa.tpdeny:
+    default: true
+    description: Allows the player to use the /tpadeny command
+  fourtpa.tpdenyall:
+    default: true
+    description: Allows the player to use the /tpdenyall command
+
+commands:
+  back:
+    aliases: []
+    description: Teleport back to your previous location
+    permission: fourtpa.back
+    permission-message: You do not have permission to use this command
+    usage: /back
+  tpa:
+    aliases: []
+    description: Request to teleport to a player
+    permission: fourtpa.tpa
+    permission-message: You do not have permission to use this command
+    usage: /tpa <player>
+  tpacancel:
+    aliases: []
+    description: Cancel a teleport request
+    permission: fourtpa.tpcancel
+    permission-message: You do not have permission to use this command
+    usage: /tpacancel
+  tpaccept:
+    aliases: []
+    description: Accept a teleport request
+    permission: fourtpa.tpaccept
+    permission-message: You do not have permission to use this command
+    usage: /tpaccept <player>
+  tpacceptall:
+    aliases: []
+    description: Accept all teleport requests
+    permission: fourtpa.tpacceptall
+    permission-message: You do not have permission to use this command
+    usage: /tpacceptall
+  tpadeny:
+    aliases: []
+    description: Deny a teleport request
+    permission: fourtpa.tpdeny
+    permission-message: You do not have permission to use this command
+    usage: /tpadeny <player>
+  tpadenyall:
+    aliases: []
+    description: Deny all teleport requests
+    permission: fourtpa.tpdenyall
+    permission-message: You do not have permission to use this command
+    usage: /tpdenyall
+  tpahere:
+    aliases: []
+    description: Request a player to teleport to you
+    permission: fourtpa.tpahere
+    permission-message: You do not have permission to use this command
+    usage: /tpahere <player>
+  tpareload:
+    aliases: []
+    description: Reload the plugin
+    permission: fourtpa.reload
+    permission-message: You do not have permission to use this command
+    usage: /tpareload
+  tpaoffline:
+    aliases: []
+    description: Teleports to the last known location of an offline player
+    permission: fourtpa.tpaoffline
+    permission-message: You do not have permission to use this command
+    usage: /tpaoffline <player>

@@ -1,0 +1,30 @@
+prefix: '&8[&c4TPA&8]&7'
+reloaded: 'Configuration reloaded.'
+players_only: 'This command can only be run by a player.'
+player_not_found: 'Player {0} was not found.'
+player_went_offline: '{0} has gone offline.'
+player_is_online: '{0} is currently online.'
+player_has_not_played_before: 'Player {0} has never played on this server before.'
+
+player_back_missing: 'You have no previous location to teleport back to.'
+player_back_teleported: 'You have been teleported back to your previous location.'
+
+tpa_none: 'You do not have any pending teleport requests.'
+
+tpa_sender_send: 'You have sent a teleport request to {0}. They have {1} seconds to accept.'
+tpa_sender_expired: 'Your teleport request to {0} has expired.'
+tpa_sender_conflict: 'You already have a pending teleport request to {0}.'
+tpa_sender_cancel: 'You have cancelled your teleport request to {0}.'
+tpa_sender_accepted: '{0} has accepted your teleport request.'
+tpa_sender_denied: '{0} has denied your teleport request.'
+tpa_sender_all: 'You have accepted all {0} pending teleport requests.'
+
+tpa_here_sender: 'You have requested {0} to teleport to you. They have {1} seconds to accept.'
+tpa_here_receiver: '{0} has requested you to teleport to them. Use /tpaccept to accept it or /tpadeny to deny it. You have {1} seconds to decide.'
+
+tpa_receiver_receive: '{0} has sent you a teleport request. Use /tpaccept to accept it or /tpadeny to deny it. You have {1} seconds to decide.'
+tpa_receiver_accept: 'You have accepted the teleport request from {0}.'
+tpa_receiver_deny: 'You have denied the teleport request from {0}.'
+tpa_receiver_expired: 'The teleport request from {0} has expired.'
+tpa_receiver_cancel: 'Player {0} has cancelled their teleport request.'
+tpa_receiver_not_found: 'You do not have any pending teleport requests from {0}.'

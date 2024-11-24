@@ -1,0 +1,5 @@
+# Which language file to use within plugins/4TPA/lang
+lang: en_US
+
+# When a TPA request should auto-cancel
+tpa_timeout: 60
