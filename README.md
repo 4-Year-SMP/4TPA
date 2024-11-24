@@ -2,9 +2,9 @@
 
 A Paper/Folia TPA plugin.
 
-![A MP4 Video demonstrating the /tpaccept command. A player named "Pride_Dad" sending a TPA request to a player named "OoLunar." The request is accepted and Pride_Dad is teleported to OoLunar.](./res/tpa.mp4)
+![A gif demonstrating the /tpaccept command. A player named "Pride_Dad" sending a TPA request to a player named "OoLunar." The request is accepted and Pride_Dad is teleported to OoLunar.](./res/tpa.gif)
 
-![A MP4 Video demonstrating the /tpadeny command. A player named "Pride_Dad" sending a TPA request to a player named "OoLunar." The request is denied and Pride_Dad is not teleported to OoLunar.](./res/tpadeny.mp4)
+![A gif demonstrating the /tpadeny command. A player named "Pride_Dad" sending a TPA request to a player named "OoLunar." The request is denied and Pride_Dad is not teleported to OoLunar.](./res/tpadeny.gif)
 
 # Commands
 
