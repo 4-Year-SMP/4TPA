@@ -37,6 +37,9 @@ tpa_timeout: 60
 fourtpa.back:
   default: true
   description: Allows the player to use the /back command
+fourtpa.back.ondeath:
+  default: true
+  description: Allows the player to use the /back command when they die
 fourtpa.reload:
   default: op
   description: Allows the player to use the /tpareload command

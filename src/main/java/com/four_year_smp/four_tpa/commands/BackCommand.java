@@ -58,7 +58,9 @@ public final class BackCommand implements CommandExecutor, Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        _backLocations.put(event.getEntity().getUniqueId(), event.getEntity().getLocation());
-        _plugin.getLogger().info(MessageFormat.format("Stored /back location for player {0}: {1}", event.getEntity().getName(), event.getEntity().getLocation()));
+        if (event.getPlayer().hasPermission("four_tpa.back.on_death")) {
+            _backLocations.put(event.getEntity().getUniqueId(), event.getEntity().getLocation());
+            _plugin.getLogger().info(MessageFormat.format("Stored /back location for player {0}: {1}", event.getEntity().getName(), event.getEntity().getLocation()));
+        }
     }
 }
