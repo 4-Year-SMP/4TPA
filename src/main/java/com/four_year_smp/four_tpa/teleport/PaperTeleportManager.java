@@ -93,7 +93,7 @@ public class PaperTeleportManager implements ITeleportManager {
             } else if (request.isAccepted()) {
                 _plugin.getLogger().info(MessageFormat.format("Accepting request from {0}", sender));
                 _requests.remove(sender);
-                _scheduler.runTask(_plugin, () -> acceptRequest(sender, request.getReceiver()));
+                _scheduler.runTask(_plugin, () -> acceptRequest(request));
             } else if (request.hasExpired(getTimeout() * 1000)) {
                 _plugin.getLogger().info(MessageFormat.format("Expiring request from {0}", sender));
                 _requests.remove(sender);
@@ -104,26 +104,26 @@ public class PaperTeleportManager implements ITeleportManager {
         _scheduler.runTaskLater(_plugin, this::processRequests, 1);
     }
 
-    private void acceptRequest(UUID sender, UUID receiver) {
-        Player senderPlayer = _plugin.getServer().getPlayer(sender);
-        Player receiverPlayer = _plugin.getServer().getPlayer(receiver);
+    private void acceptRequest(TeleportRequest teleportRequest) {
+        Player senderPlayer = _plugin.getServer().getPlayer(teleportRequest.getSender());
+        Player receiverPlayer = _plugin.getServer().getPlayer(teleportRequest.getReceiver());
         if (senderPlayer == null) {
             // If the sender is offline, let the receiver know.
-            OfflinePlayer offlineSender = Bukkit.getOfflinePlayer(sender);
+            OfflinePlayer offlineSender = Bukkit.getOfflinePlayer(teleportRequest.getSender());
             receiverPlayer.sendMessage(_localizationHandler.getPlayerWentOffline(offlineSender.getName()));
             return;
         } else if (receiverPlayer == null) {
             // If the receiver is offline, let the sender know.
-            OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(receiver);
+            OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(teleportRequest.getReceiver());
             senderPlayer.sendMessage(_localizationHandler.getPlayerWentOffline(offlineReceiver.getName()));
             return;
         }
 
         // Try teleporting the sender to the receiver.
-        if (_requests.get(sender) instanceof TeleportHereRequest) {
-            senderPlayer.teleport(receiverPlayer.getLocation());
+        if (teleportRequest instanceof TeleportHereRequest) {
+            receiverPlayer.teleport(senderPlayer);
         } else {
-            receiverPlayer.teleport(senderPlayer.getLocation());
+            senderPlayer.teleport(receiverPlayer);
         }
     }
 
