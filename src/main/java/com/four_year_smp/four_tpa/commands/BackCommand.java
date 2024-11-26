@@ -54,7 +54,7 @@ public final class BackCommand implements CommandExecutor, Listener {
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         // Only store /back locations for player-initiated teleports
-        if (event.getCause() != TeleportCause.COMMAND || event.getCause() != TeleportCause.PLUGIN) {
+        if (event.getCause() != TeleportCause.COMMAND && event.getCause() != TeleportCause.PLUGIN) {
             return;
         }
 
