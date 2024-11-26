@@ -46,7 +46,7 @@ public final class FourTpaPlugin extends JavaPlugin implements Listener {
         getCommand("tpahere").setExecutor(new TpaHereCommand(_localizationHandler, _teleportManager));
         getCommand("tpacceptall").setExecutor(new TpaAcceptAllCommand(_localizationHandler, _teleportManager));
         getCommand("tpadenyall").setExecutor(new TpaDenyAllCommand(_localizationHandler, _teleportManager));
-        getCommand("tpareload").setExecutor(new TpaReloadCommand(_localizationHandler, _teleportManager));
+        getCommand("tpareload").setExecutor(new TpaReloadCommand(_localizationHandler, _teleportManager, this));
         getCommand("tpaoffline").setExecutor(tpaOfflineCommand);
     }
 
