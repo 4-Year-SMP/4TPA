@@ -17,6 +17,7 @@ public class TpaReloadCommand extends AbstractTpaCommand {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         _localizationHandler.reload();
+        _plugin.saveDefaultConfig();
         _plugin.reloadConfig();
         sender.sendMessage(_localizationHandler.getReloaded());
         return true;
