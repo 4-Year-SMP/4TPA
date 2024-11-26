@@ -20,6 +20,8 @@ public interface ITeleportManager {
 
     public void teleport(Player player, Location location);
 
+    public Location getLastLocation(UUID playerId);
+
     public int getTimeout();
 
     public void processRequests();

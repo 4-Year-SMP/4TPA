@@ -7,13 +7,21 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.scheduler.BukkitScheduler;
 import com.four_year_smp.four_tpa.FourTpaPlugin;
 import com.four_year_smp.four_tpa.LocalizationHandler;
 
-public class PaperTeleportManager implements ITeleportManager {
+public class PaperTeleportManager implements ITeleportManager, Listener {
     private final BukkitScheduler _scheduler;
+    private final HashMap<UUID, Location> _lastLocations = new HashMap<UUID, Location>();
 
     protected final FourTpaPlugin _plugin;
     protected final LocalizationHandler _localizationHandler;
@@ -77,7 +85,15 @@ public class PaperTeleportManager implements ITeleportManager {
     }
 
     public void teleport(Player player, Location location) {
+        _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
+        _lastLocations.put(player.getUniqueId(), player.getLocation());
+
+        _plugin.getLogger().info(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
         player.teleport(location);
+    }
+
+    public Location getLastLocation(UUID playerId) {
+        return _lastLocations.get(playerId);
     }
 
     public int getTimeout() {
@@ -147,6 +163,47 @@ public class PaperTeleportManager implements ITeleportManager {
 
         if (receiverPlayer != null) {
             receiverPlayer.sendMessage(_localizationHandler.getTpaReceiverExpired(senderName));
+        }
+    }
+
+    // This will not work on Folia
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        // Only store /back locations for player-initiated teleports
+        if (event.getCause() != TeleportCause.COMMAND && event.getCause() != TeleportCause.PLUGIN) {
+            return;
+        }
+
+        _lastLocations.put(event.getPlayer().getUniqueId(), event.getFrom());
+        _plugin.getLogger().info(MessageFormat.format("Stored /back location for player {0}: {1}", event.getPlayer().getName(), event.getFrom()));
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        if (event.getPlayer().hasPermission("fourtpa.back.on_death")) {
+            _lastLocations.put(event.getEntity().getUniqueId(), event.getEntity().getLocation());
+            _plugin.getLogger().info(MessageFormat.format("Stored /back location for player {0}: {1}", event.getEntity().getName(), event.getEntity().getLocation()));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent eventArgs) {
+        Server server = eventArgs.getPlayer().getServer();
+        String playerName = eventArgs.getPlayer().getName();
+        UUID playerId = eventArgs.getPlayer().getUniqueId();
+
+        // Cancel the TPA request the player has sent
+        TeleportRequest request = cancel(playerId);
+        if (request != null && server.getPlayer(request.getReceiver()) instanceof Player sender) {
+            sender.sendMessage(_localizationHandler.getPlayerWentOffline(playerName));
+        }
+
+        // Cancel the TPA requests that the player has received
+        for (TeleportRequest receiverRequest : getRequests(playerId)) {
+            if (server.getPlayer(receiverRequest.getSender()) instanceof Player sender) {
+                cancel(receiverRequest.getSender());
+                sender.sendMessage(_localizationHandler.getPlayerWentOffline(playerName));
+            }
         }
     }
 }

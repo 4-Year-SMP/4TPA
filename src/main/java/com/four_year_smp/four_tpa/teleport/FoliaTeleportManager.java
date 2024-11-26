@@ -22,11 +22,7 @@ public final class FoliaTeleportManager extends PaperTeleportManager {
 
     @Override
     public void teleport(Player player, Location location) {
-        if (_plugin.isFolia) {
-            player.getScheduler().run(_plugin, task -> player.teleportAsync(location), null);
-        } else {
-            player.teleport(location);
-        }
+        player.getScheduler().run(_plugin, task -> player.teleportAsync(location), null);
     }
 
     @Override

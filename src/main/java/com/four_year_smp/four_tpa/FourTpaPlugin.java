@@ -1,11 +1,6 @@
 package com.four_year_smp.four_tpa;
 
-import java.util.UUID;
-import org.bukkit.Server;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.four_year_smp.four_tpa.commands.BackCommand;
@@ -21,11 +16,8 @@ import com.four_year_smp.four_tpa.commands.TpaReloadCommand;
 import com.four_year_smp.four_tpa.teleport.FoliaTeleportManager;
 import com.four_year_smp.four_tpa.teleport.ITeleportManager;
 import com.four_year_smp.four_tpa.teleport.PaperTeleportManager;
-import com.four_year_smp.four_tpa.teleport.TeleportRequest;
 
 public final class FourTpaPlugin extends JavaPlugin implements Listener {
-    public final boolean isFolia = isFolia();
-
     private LocalizationHandler _localizationHandler;
     private ITeleportManager _teleportManager;
 
@@ -34,16 +26,15 @@ public final class FourTpaPlugin extends JavaPlugin implements Listener {
         saveDefaultConfig();
 
         _localizationHandler = new LocalizationHandler(this);
-        _teleportManager = isFolia ? new FoliaTeleportManager(this, getServer().getAsyncScheduler(), _localizationHandler) : new PaperTeleportManager(this, getServer().getScheduler(), _localizationHandler);
+        _teleportManager = isFolia() ? new FoliaTeleportManager(this, getServer().getAsyncScheduler(), _localizationHandler) : new PaperTeleportManager(this, getServer().getScheduler(), _localizationHandler);
         _teleportManager.processRequests();
 
         // Register the event listeners
-        BackCommand backCommand = new BackCommand(_localizationHandler, _teleportManager, this);
+        BackCommand backCommand = new BackCommand(_localizationHandler, _teleportManager);
         TpaOfflineCommand tpaOfflineCommand = new TpaOfflineCommand(_localizationHandler, _teleportManager, this);
 
         PluginManager pluginManager = getServer().getPluginManager();
-        pluginManager.registerEvents(this, this);
-        pluginManager.registerEvents(backCommand, this);
+        pluginManager.registerEvents((Listener) _teleportManager, this);
         pluginManager.registerEvents(tpaOfflineCommand, this);
 
         // Register the commands
@@ -62,27 +53,6 @@ public final class FourTpaPlugin extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         _teleportManager.dispose();
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent eventArgs) {
-        Server server = getServer();
-        String playerName = eventArgs.getPlayer().getName();
-        UUID playerId = eventArgs.getPlayer().getUniqueId();
-
-        // Cancel the TPA request the player has sent
-        TeleportRequest request = _teleportManager.cancel(playerId);
-        if (request != null && server.getPlayer(request.getReceiver()) instanceof Player sender) {
-            sender.sendMessage(_localizationHandler.getPlayerWentOffline(playerName));
-        }
-
-        // Cancel the TPA requests that the player has received
-        for (TeleportRequest receiverRequest : _teleportManager.getRequests(playerId)) {
-            if (server.getPlayer(receiverRequest.getSender()) instanceof Player sender) {
-                _teleportManager.cancel(receiverRequest.getSender());
-                sender.sendMessage(_localizationHandler.getPlayerWentOffline(playerName));
-            }
-        }
     }
 
     private static boolean isFolia() {
