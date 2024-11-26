@@ -80,13 +80,13 @@ public class TpaOfflineCommand extends AbstractTpaCommand implements TabComplete
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent eventArgs) {
-        _plugin.getLogger().info(MessageFormat.format("Added player {0} to the offline player cache.", eventArgs.getPlayer().getName()));
+        _plugin.logDebug(MessageFormat.format("Added player {0} to the offline player cache.", eventArgs.getPlayer().getName()));
         _offlinePlayers.add(eventArgs.getPlayer().getServer().getOfflinePlayer(eventArgs.getPlayer().getName()));
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent eventArgs) {
-        _plugin.getLogger().info(MessageFormat.format("Removed player {0} from the offline player cache.", eventArgs.getPlayer().getName()));
+        _plugin.logDebug(MessageFormat.format("Removed player {0} from the offline player cache.", eventArgs.getPlayer().getName()));
         _offlinePlayers.remove(eventArgs.getPlayer().getServer().getOfflinePlayer(eventArgs.getPlayer().getName()));
     }
 }

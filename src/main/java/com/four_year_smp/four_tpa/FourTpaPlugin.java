@@ -55,11 +55,17 @@ public final class FourTpaPlugin extends JavaPlugin implements Listener {
         _teleportManager.dispose();
     }
 
+    public void logDebug(String message) {
+        if (getConfig().getBoolean("debug")) {
+            getLogger().info(message);
+        }
+    }
+
     private static boolean isFolia() {
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
             return true;
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException error) {
             return false;
         }
     }

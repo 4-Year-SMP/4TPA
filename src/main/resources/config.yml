@@ -1,3 +1,7 @@
+# Whether to enable debug logging or not.
+# This is helpful for when requests are not going through as expected.
+debug: false
+
 # Which language file to use within plugins/4TPA/lang
 lang: en_US
 

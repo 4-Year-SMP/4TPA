@@ -34,40 +34,40 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
     }
 
     public void add(TeleportRequest request) {
-        _plugin.getLogger().info(MessageFormat.format("Adding request from {0}", request.getSender()));
+        _plugin.logDebug(MessageFormat.format("Created request: {0} -> {1}", request.getSender(), request.getReceiver()));
         _requests.put(request.getSender(), request);
     }
 
     public void accept(UUID sender) {
         TeleportRequest teleportRequest = _requests.get(sender);
         if (teleportRequest == null) {
-            _plugin.getLogger().info(MessageFormat.format("Request from {0} not found.", sender));
+            _plugin.logDebug(MessageFormat.format("Failed to accept request from {0}: Not found", sender));
             return;
         }
 
         teleportRequest.accept();
-        _plugin.getLogger().info(MessageFormat.format("Accepted request from {0}", sender));
+        _plugin.logDebug(MessageFormat.format("Accepted request from {0}", sender));
     }
 
     public TeleportRequest cancel(UUID sender) {
-        _plugin.getLogger().info(MessageFormat.format("Cancelling request from {0}", sender));
+        _plugin.logDebug(MessageFormat.format("Cancelling request from {0}", sender));
         return _requests.remove(sender);
     }
 
     public TeleportRequest getSender(UUID sender) {
-        _plugin.getLogger().info(MessageFormat.format("Getting request from {0}", sender));
+        _plugin.logDebug(MessageFormat.format("Retrieving request from {0}", sender));
         return _requests.get(sender);
     }
 
     public TeleportRequest getRequest(UUID receiver, UUID sender) {
         for (TeleportRequest request : _requests.values()) {
             if (request.getReceiver() == receiver && request.getSender() == sender) {
-                _plugin.getLogger().info(MessageFormat.format("Found request from {0} to {1}", sender, receiver));
+                _plugin.logDebug(MessageFormat.format("Found request from {0} to {1}", sender, receiver));
                 return request;
             }
         }
 
-        _plugin.getLogger().info(MessageFormat.format("Request from {0} to {1} not found.", sender, receiver));
+        _plugin.logDebug(MessageFormat.format("Request from {0} to {1} not found.", sender, receiver));
         return null;
     }
 
@@ -75,12 +75,12 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
         ArrayList<TeleportRequest> requests = new ArrayList<TeleportRequest>();
         for (TeleportRequest request : _requests.values()) {
             if (request.getReceiver() == receiver) {
-                _plugin.getLogger().info(MessageFormat.format("Adding request from {0} to {1}", request.getSender(), receiver));
+                _plugin.logDebug(MessageFormat.format("Adding request from {0} to {1}", request.getSender(), receiver));
                 requests.add(request);
             }
         }
 
-        _plugin.getLogger().info(MessageFormat.format("Found {0} requests for {1}", requests.size(), receiver));
+        _plugin.logDebug(MessageFormat.format("Found {0} requests for {1}", requests.size(), receiver));
         return requests;
     }
 
@@ -88,7 +88,7 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
         _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
         _lastLocations.put(player.getUniqueId(), player.getLocation());
 
-        _plugin.getLogger().info(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
+        _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
         player.teleport(location);
     }
 
@@ -176,8 +176,8 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
 
         // Calculate the distance between the two positions
         double distance = event.getFrom().distance(event.getTo());
-        if (distance > _plugin.getConfig().getDouble("minimum_tpa_track_distance", 50.0)) {
-            _plugin.getLogger().info(MessageFormat.format("Ignoring /back location for player {0}: {1} -> {2} (distance: {3})", event.getPlayer().getName(), event.getFrom(), event.getTo(), distance));
+        if (distance < _plugin.getConfig().getDouble("minimum_tpa_track_distance", 50.0)) {
+            _plugin.logDebug(MessageFormat.format("Ignoring /back location for player {0}: {1} -> {2} (distance: {3})", event.getPlayer().getName(), event.getFrom(), event.getTo(), distance));
             return;
         }
 
