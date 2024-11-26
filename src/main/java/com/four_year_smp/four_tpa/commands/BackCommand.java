@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.jetbrains.annotations.NotNull;
 import com.four_year_smp.four_tpa.FourTpaPlugin;
 import com.four_year_smp.four_tpa.LocalizationHandler;
@@ -52,6 +53,11 @@ public final class BackCommand implements CommandExecutor, Listener {
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
+        // Only store /back locations for player-initiated teleports
+        if (event.getCause() != TeleportCause.COMMAND || event.getCause() != TeleportCause.PLUGIN) {
+            return;
+        }
+
         _backLocations.put(event.getPlayer().getUniqueId(), event.getFrom());
         _plugin.getLogger().info(MessageFormat.format("Stored /back location for player {0}: {1}", event.getPlayer().getName(), event.getFrom()));
     }
