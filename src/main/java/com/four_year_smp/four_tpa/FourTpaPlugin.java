@@ -38,7 +38,7 @@ public final class FourTpaPlugin extends JavaPlugin implements Listener {
         _teleportManager.processRequests();
 
         // Register the event listeners
-        BackCommand backCommand = new BackCommand(_localizationHandler, this);
+        BackCommand backCommand = new BackCommand(_localizationHandler, _teleportManager, this);
         TpaOfflineCommand tpaOfflineCommand = new TpaOfflineCommand(_localizationHandler, _teleportManager, this);
 
         PluginManager pluginManager = getServer().getPluginManager();

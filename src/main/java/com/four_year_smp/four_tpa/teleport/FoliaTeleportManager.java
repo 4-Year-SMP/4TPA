@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import com.four_year_smp.four_tpa.FourTpaPlugin;
@@ -17,6 +18,15 @@ public final class FoliaTeleportManager extends PaperTeleportManager {
     public FoliaTeleportManager(FourTpaPlugin plugin, AsyncScheduler scheduler, LocalizationHandler localizationHandler) {
         super(plugin, null, localizationHandler);
         _scheduler = scheduler;
+    }
+
+    @Override
+    public void teleport(Player player, Location location) {
+        if (_plugin.isFolia) {
+            player.getScheduler().run(_plugin, task -> player.teleportAsync(location), null);
+        } else {
+            player.teleport(location);
+        }
     }
 
     @Override
@@ -63,9 +73,9 @@ public final class FoliaTeleportManager extends PaperTeleportManager {
 
         // Try teleporting the sender to the receiver.
         if (request instanceof TeleportHereRequest) {
-            senderPlayer.getScheduler().run(_plugin, task -> receiverPlayer.teleportAsync(senderPlayer.getLocation()), null);
+            senderPlayer.getScheduler().run(_plugin, task -> teleport(receiverPlayer, senderPlayer.getLocation()), null);
         } else {
-            receiverPlayer.getScheduler().run(_plugin, task -> senderPlayer.teleportAsync(receiverPlayer.getLocation()), null);
+            receiverPlayer.getScheduler().run(_plugin, task -> teleport(senderPlayer, receiverPlayer.getLocation()), null);
         }
     }
 }

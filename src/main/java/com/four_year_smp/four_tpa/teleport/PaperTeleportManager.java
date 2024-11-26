@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -75,6 +76,10 @@ public class PaperTeleportManager implements ITeleportManager {
         return requests;
     }
 
+    public void teleport(Player player, Location location) {
+        player.teleport(location);
+    }
+
     public int getTimeout() {
         return _plugin.getConfig().getInt("tpa_timeout", 60);
     }
@@ -121,9 +126,9 @@ public class PaperTeleportManager implements ITeleportManager {
 
         // Try teleporting the sender to the receiver.
         if (teleportRequest instanceof TeleportHereRequest) {
-            receiverPlayer.teleport(senderPlayer);
+            teleport(receiverPlayer, senderPlayer.getLocation());
         } else {
-            senderPlayer.teleport(receiverPlayer);
+            teleport(senderPlayer, receiverPlayer.getLocation());
         }
     }
 

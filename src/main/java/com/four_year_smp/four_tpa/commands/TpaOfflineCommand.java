@@ -55,12 +55,7 @@ public class TpaOfflineCommand extends AbstractTpaCommand implements TabComplete
         }
 
         // Teleport the player to the offline player's last known location
-        if (_plugin.isFolia) {
-            sender.getScheduler().run(_plugin, task -> sender.teleportAsync(location), null);
-        } else {
-            sender.teleport(location);
-        }
-
+        _teleportManager.teleport(sender, location);
         return true;
     }
 
