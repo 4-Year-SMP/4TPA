@@ -1,5 +1,9 @@
 # Which language file to use within plugins/4TPA/lang
 lang: en_US
 
+# How many blocks away from the original location should a teleport be considered a teleport?
+# This is mainly used for /back
+minimum_tpa_track_distance: 50.0
+
 # When a TPA request should auto-cancel
 tpa_timeout: 60
