@@ -1,6 +1,7 @@
 package com.four_year_smp.four_tpa.commands;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Server;
@@ -73,7 +74,7 @@ public class TpaAcceptCommand extends AbstractTpaCommand implements TabCompleter
         if (!(sender instanceof Player player)) {
             return null;
         } else if (args.length == 1) {
-            return new ArrayList<String>();
+            return Collections.emptyList();
         }
 
         Server server = player.getServer();

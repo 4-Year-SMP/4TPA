@@ -1,6 +1,7 @@
 package com.four_year_smp.four_tpa.commands;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Server;
@@ -59,6 +60,6 @@ public class TpaAcceptAllCommand extends AbstractTpaCommand implements TabComple
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return new ArrayList<String>();
+        return Collections.emptyList();
     }
 }

@@ -1,6 +1,6 @@
 package com.four_year_smp.four_tpa.commands;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -40,6 +40,6 @@ public class TpaCancelCommand extends AbstractTpaCommand implements TabCompleter
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return new ArrayList<String>();
+        return Collections.emptyList();
     }
 }
