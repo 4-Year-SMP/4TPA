@@ -160,7 +160,7 @@ public class LocalizationHandler {
             Map<?, ?> kvp = yaml.load(translationStream);
             for (Map.Entry<?, ?> entry : kvp.entrySet()) {
                 _translations.put(entry.getKey().toString(), entry.getValue().toString());
-                _plugin.getLogger().info(MessageFormat.format("Loaded translation: {0} -> {1}", entry.getKey(), entry.getValue()));
+                _plugin.logDebug(MessageFormat.format("Loaded translation: {0} -> {1}", entry.getKey(), entry.getValue()));
             }
 
             try {

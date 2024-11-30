@@ -4,6 +4,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
+import org.sayandev.sayanvanish.api.SayanVanishAPI;
+import org.sayandev.sayanvanish.api.User;
 import com.four_year_smp.four_tpa.LocalizationHandler;
 import com.four_year_smp.four_tpa.teleport.ITeleportManager;
 import com.four_year_smp.four_tpa.teleport.TeleportHereRequest;
@@ -49,7 +51,15 @@ public abstract class AbstractTpaCommand implements CommandExecutor {
 
     public Player getPlayerOrFailWithMessage(Server server, Player player, String targetName) {
         if (server.getPlayerExact(targetName) instanceof Player target) {
-            return target;
+            SayanVanishAPI<User> api = SayanVanishAPI.getInstance();
+            User playerUser = api.getUser(player.getUniqueId());
+            User targetUser = api.getUser(target.getUniqueId());
+            if (SayanVanishAPI.getInstance().canSee(playerUser, targetUser)) {
+                return target;
+            } else {
+                player.sendMessage(_localizationHandler.getPlayerWentOffline(target.getName()));
+                return null;
+            }
         } else if (server.getOfflinePlayerIfCached(targetName) instanceof OfflinePlayer offlineTarget) {
             // Player 'OoLunar' is not online.
             player.sendMessage(_localizationHandler.getPlayerWentOffline(offlineTarget.getName()));

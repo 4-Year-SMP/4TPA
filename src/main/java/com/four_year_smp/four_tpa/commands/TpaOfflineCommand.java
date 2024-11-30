@@ -65,8 +65,6 @@ public class TpaOfflineCommand extends AbstractTpaCommand implements TabComplete
         for (OfflinePlayer player : _offlinePlayers) {
             if (completions.size() == 100) {
                 break;
-            } else if (player.isOnline()) {
-                continue;
             }
 
             String name = player.getName();
