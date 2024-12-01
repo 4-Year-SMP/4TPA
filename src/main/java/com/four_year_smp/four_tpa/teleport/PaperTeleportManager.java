@@ -175,10 +175,14 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
         }
 
         // Calculate the distance between the two positions
-        double distance = event.getFrom().distance(event.getTo());
-        if (distance < _plugin.getConfig().getDouble("minimum_tpa_track_distance", 50.0)) {
-            _plugin.logDebug(MessageFormat.format("Ignoring /back location for player {0}: {1} -> {2} (distance: {3})", event.getPlayer().getName(), event.getFrom(), event.getTo(), distance));
-            return;
+        Location from = event.getFrom();
+        Location to = event.getTo();
+        if (from.getWorld() == to.getWorld()) {
+            double distance = event.getFrom().distance(event.getTo());
+            if (distance < _plugin.getConfig().getDouble("minimum_tpa_track_distance", 50.0)) {
+                _plugin.logDebug(MessageFormat.format("Ignoring /back location for player {0}: {1} -> {2} (distance: {3})", event.getPlayer().getName(), event.getFrom(), event.getTo(), distance));
+                return;
+            }
         }
 
         // Store the last location for the player
