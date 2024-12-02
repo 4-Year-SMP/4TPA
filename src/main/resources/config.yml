@@ -11,3 +11,7 @@ minimum_tpa_track_distance: 50.0
 
 # When a TPA request should auto-cancel
 tpa_timeout: 60
+
+# How long a player should wait before the TPA request teleports them.
+# The delay is in seconds and players can move while they wait.
+tpa_delay: -1

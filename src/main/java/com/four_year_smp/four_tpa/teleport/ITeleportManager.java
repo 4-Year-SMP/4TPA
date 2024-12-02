@@ -18,7 +18,7 @@ public interface ITeleportManager {
 
     public ArrayList<TeleportRequest> getRequests(UUID receiver);
 
-    public void teleport(Player player, Location location);
+    public void teleport(Player player, Location location, int delay);
 
     public Location getLastLocation(UUID playerId);
 

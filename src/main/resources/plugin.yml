@@ -16,6 +16,9 @@ permissions:
   fourtpa.back.ondeath:
     default: true
     description: Allows the player to use the /back command when they die
+  fourtpa.instant:
+    default: op
+    description: Allows the player to use the /tpa command without a delay
   fourtpa.reload:
     default: op
     description: Allows the player to use the /tpareload command
@@ -93,15 +96,15 @@ commands:
     permission: fourtpa.tpahere
     permission-message: You do not have permission to use this command
     usage: /tpahere <player>
-  tpareload:
-    aliases: []
-    description: Reload the plugin
-    permission: fourtpa.reload
-    permission-message: You do not have permission to use this command
-    usage: /tpareload
   tpaoffline:
     aliases: []
     description: Teleports to the last known location of an offline player
     permission: fourtpa.tpaoffline
     permission-message: You do not have permission to use this command
     usage: /tpaoffline <player>
+  tpareload:
+    aliases: []
+    description: Reload the plugin
+    permission: fourtpa.reload
+    permission-message: You do not have permission to use this command
+    usage: /tpareload

@@ -21,8 +21,32 @@ public final class FoliaTeleportManager extends PaperTeleportManager {
     }
 
     @Override
-    public void teleport(Player player, Location location) {
-        player.getScheduler().run(_plugin, task -> player.teleportAsync(location), null);
+    public void teleport(Player player, Location location, int delay) {
+        // Default value support since JAVA CAN'T HAVE DEFAULT VALUES FOR FUNCTION PARAMETERS
+        // What even is this programming language man - A C# dev
+        if (delay == -1) {
+            delay = _plugin.getConfig().getInt("tpa_delay", 0);
+        }
+
+        // If the delay is 0, teleport the player immediately.
+        if (delay == 0 || player.hasPermission("fourtpa.instant")) {
+            player.getScheduler().run(_plugin, task -> {
+                _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
+                _lastLocations.put(player.getUniqueId(), player.getLocation());
+
+                _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
+                player.teleportAsync(location);
+            }, null);
+
+            return;
+        }
+
+        // Otherwise count down and teleport the player after the delay
+        player.sendActionBar(_localizationHandler.getTeleportDelayMessage(delay));
+
+        // Delay is in ticks and there's 20 ticks in a second...
+        final int nextDelay = delay - 1;
+        _scheduler.runDelayed(_plugin, task -> teleport(player, location, nextDelay), nextDelay, TimeUnit.SECONDS);
     }
 
     @Override
@@ -69,9 +93,9 @@ public final class FoliaTeleportManager extends PaperTeleportManager {
 
         // Try teleporting the sender to the receiver.
         if (request instanceof TeleportHereRequest) {
-            senderPlayer.getScheduler().run(_plugin, task -> teleport(receiverPlayer, senderPlayer.getLocation()), null);
+            senderPlayer.getScheduler().run(_plugin, task -> teleport(receiverPlayer, senderPlayer.getLocation(), -1), null);
         } else {
-            receiverPlayer.getScheduler().run(_plugin, task -> teleport(senderPlayer, receiverPlayer.getLocation()), null);
+            receiverPlayer.getScheduler().run(_plugin, task -> teleport(senderPlayer, receiverPlayer.getLocation(), -1), null);
         }
     }
 }

@@ -21,10 +21,10 @@ import com.four_year_smp.four_tpa.LocalizationHandler;
 
 public class PaperTeleportManager implements ITeleportManager, Listener {
     private final BukkitScheduler _scheduler;
-    private final HashMap<UUID, Location> _lastLocations = new HashMap<UUID, Location>();
 
     protected final FourTpaPlugin _plugin;
     protected final LocalizationHandler _localizationHandler;
+    protected final HashMap<UUID, Location> _lastLocations = new HashMap<UUID, Location>();
     protected final HashMap<UUID, TeleportRequest> _requests = new HashMap<UUID, TeleportRequest>();
 
     public PaperTeleportManager(FourTpaPlugin plugin, BukkitScheduler scheduler, LocalizationHandler localizationHandler) {
@@ -84,12 +84,29 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
         return requests;
     }
 
-    public void teleport(Player player, Location location) {
-        _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
-        _lastLocations.put(player.getUniqueId(), player.getLocation());
+    public void teleport(Player player, Location location, int delay) {
+        // Default value support since JAVA CAN'T HAVE DEFAULT VALUES FOR FUNCTION PARAMETERS
+        // What even is this programming language man - A C# dev
+        if (delay == -1) {
+            delay = _plugin.getConfig().getInt("tpa_delay", 0) * 20;
+        }
 
-        _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
-        player.teleport(location);
+        // If the delay is 0, teleport the player immediately
+        if (delay == 0 || player.hasPermission("fourtpa.instant")) {
+            _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
+            _lastLocations.put(player.getUniqueId(), player.getLocation());
+
+            _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
+            player.teleport(location);
+            return;
+        }
+
+        // Otherwise count down and teleport the player after the delay
+        player.sendActionBar(_localizationHandler.getTeleportDelayMessage(delay / 20));
+
+        // Delay is in ticks and there's 20 ticks in a second...
+        final int nextDelay = delay - 20;
+        _scheduler.runTaskLater(_plugin, () -> teleport(player, location, nextDelay), nextDelay);
     }
 
     public Location getLastLocation(UUID playerId) {
@@ -142,9 +159,9 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
 
         // Try teleporting the sender to the receiver.
         if (teleportRequest instanceof TeleportHereRequest) {
-            teleport(receiverPlayer, senderPlayer.getLocation());
+            teleport(receiverPlayer, senderPlayer.getLocation(), -1);
         } else {
-            teleport(senderPlayer, receiverPlayer.getLocation());
+            teleport(senderPlayer, receiverPlayer.getLocation(), -1);
         }
     }
 

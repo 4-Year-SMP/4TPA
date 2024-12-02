@@ -10,6 +10,7 @@ player_back_missing: 'You have no previous location to teleport back to.'
 player_back_teleported: 'You have been teleported back to your previous location.'
 
 tpa_none: 'You do not have any pending teleport requests.'
+tpa_delay: 'Teleporting in {0}...'
 
 tpa_sender_send: 'You have sent a teleport request to {0}. They have {1} seconds to accept.'
 tpa_sender_expired: 'Your teleport request to {0} has expired.'
