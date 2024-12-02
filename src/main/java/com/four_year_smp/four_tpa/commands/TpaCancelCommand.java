@@ -34,7 +34,7 @@ public class TpaCancelCommand extends AbstractTpaCommand implements TabCompleter
             return true;
         }
 
-        cancelTpaRequest(request, sender, sender.getServer().getPlayer(request.getReceiver()));
+        cancelTpaRequest(request, sender, sender.getServer().getPlayer(request.getTarget()));
         return true;
     }
 

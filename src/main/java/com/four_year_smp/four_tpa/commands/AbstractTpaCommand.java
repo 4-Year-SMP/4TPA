@@ -54,7 +54,7 @@ public abstract class AbstractTpaCommand implements CommandExecutor {
             SayanVanishAPI<User> api = SayanVanishAPI.getInstance();
             User playerUser = api.getUser(player.getUniqueId());
             User targetUser = api.getUser(target.getUniqueId());
-            if (targetUser == null || SayanVanishAPI.getInstance().canSee(playerUser, targetUser)) {
+            if (targetUser == null || !targetUser.isVanished() || SayanVanishAPI.getInstance().canSee(playerUser, targetUser)) {
                 return target;
             } else {
                 player.sendMessage(_localizationHandler.getPlayerWentOffline(target.getName()));

@@ -5,13 +5,13 @@ import java.util.UUID;
 
 public class TeleportRequest {
     private final UUID _sender;
-    private final UUID _receiver;
+    private final UUID _target;
     private final Date _sentAt;
     private boolean _accepted;
 
-    public TeleportRequest(UUID sender, UUID receiver) {
+    public TeleportRequest(UUID sender, UUID target) {
         _sender = sender;
-        _receiver = receiver;
+        _target = target;
         _sentAt = new Date();
     }
 
@@ -23,8 +23,8 @@ public class TeleportRequest {
         return _sender;
     }
 
-    public UUID getReceiver() {
-        return _receiver;
+    public UUID getTarget() {
+        return _target;
     }
 
     public boolean isAccepted() {

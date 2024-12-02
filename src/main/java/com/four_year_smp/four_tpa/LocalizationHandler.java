@@ -72,7 +72,7 @@ public class LocalizationHandler {
     }
 
     public Component getTeleportDelayMessage(int seconds) {
-        return LegacyComponentSerializer.legacy('&').deserialize(getTranslation("teleport_delay", seconds));
+        return LegacyComponentSerializer.legacy('&').deserialize(getTranslation("tpa_delay", seconds));
     }
 
     public Component getTpaSenderSend(String player, int seconds) {

@@ -27,8 +27,11 @@ public final class BackCommand extends AbstractTpaCommand implements Listener {
             return true;
         }
 
-        _teleportManager.teleport(player, backLocation, -1);
-        player.sendMessage(_localizationHandler.getPlayerBackTeleported());
+        _teleportManager.delay(player, -1, () -> backLocation, loc -> {
+            _teleportManager.teleport(player, loc);
+            player.sendMessage(_localizationHandler.getPlayerBackTeleported());
+        });
+
         return true;
     }
 }

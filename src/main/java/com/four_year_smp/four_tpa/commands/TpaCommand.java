@@ -26,7 +26,7 @@ public class TpaCommand extends AbstractTpaCommand {
         TeleportRequest request = _teleportManager.getSender(sender.getUniqueId());
         if (request != null) {
             // You already have a pending request with someone else ('OoLunar').
-            Player target = invoker.getServer().getPlayer(request.getReceiver());
+            Player target = invoker.getServer().getPlayer(request.getTarget());
             if (target != null) {
                 sender.sendMessage(_localizationHandler.getTpaSenderConflict(target.getName()));
                 return true;

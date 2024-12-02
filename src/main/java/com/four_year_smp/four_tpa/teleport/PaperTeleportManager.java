@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -34,7 +36,7 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
     }
 
     public void add(TeleportRequest request) {
-        _plugin.logDebug(MessageFormat.format("Created request: {0} -> {1}", request.getSender(), request.getReceiver()));
+        _plugin.logDebug(MessageFormat.format("Created request: {0} -> {1}", request.getSender(), request.getTarget()));
         _requests.put(request.getSender(), request);
     }
 
@@ -61,7 +63,7 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
 
     public TeleportRequest getRequest(UUID receiver, UUID sender) {
         for (TeleportRequest request : _requests.values()) {
-            if (request.getReceiver() == receiver && request.getSender() == sender) {
+            if (request.getTarget() == receiver && request.getSender() == sender) {
                 _plugin.logDebug(MessageFormat.format("Found request from {0} to {1}", sender, receiver));
                 return request;
             }
@@ -74,7 +76,7 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
     public ArrayList<TeleportRequest> getRequests(UUID receiver) {
         ArrayList<TeleportRequest> requests = new ArrayList<TeleportRequest>();
         for (TeleportRequest request : _requests.values()) {
-            if (request.getReceiver() == receiver) {
+            if (request.getTarget() == receiver) {
                 _plugin.logDebug(MessageFormat.format("Adding request from {0} to {1}", request.getSender(), receiver));
                 requests.add(request);
             }
@@ -84,7 +86,7 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
         return requests;
     }
 
-    public void teleport(Player player, Location location, int delay) {
+    public void delay(Player player, int delay, Callable<Location> grabLocation, Consumer<Location> callback) {
         // Default value support since JAVA CAN'T HAVE DEFAULT VALUES FOR FUNCTION PARAMETERS
         // What even is this programming language man - A C# dev
         if (delay == -1) {
@@ -92,12 +94,13 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
         }
 
         // If the delay is 0, teleport the player immediately
-        if (delay == 0 || player.hasPermission("fourtpa.instant")) {
-            _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
-            _lastLocations.put(player.getUniqueId(), player.getLocation());
+        if (delay < 20 || player.hasPermission("fourtpa.instant")) {
+            try {
+                callback.accept(grabLocation.call());
+            } catch (Exception e) {
+                _plugin.getLogger().warning(MessageFormat.format("Failed to grab location for {0}: {1}", player.getUniqueId(), e.getMessage()));
+            }
 
-            _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
-            player.teleport(location);
             return;
         }
 
@@ -106,7 +109,15 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
 
         // Delay is in ticks and there's 20 ticks in a second...
         final int nextDelay = delay - 20;
-        _scheduler.runTaskLater(_plugin, () -> teleport(player, location, nextDelay), nextDelay);
+        _scheduler.runTaskLater(_plugin, () -> delay(player, nextDelay, grabLocation, callback), 20);
+    }
+
+    public void teleport(Player player, Location location) {
+        _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
+        _lastLocations.put(player.getUniqueId(), player.getLocation());
+
+        _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
+        player.teleport(location);
     }
 
     public Location getLastLocation(UUID playerId) {
@@ -135,16 +146,16 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
             } else if (request.hasExpired(getTimeout() * 1000)) {
                 _plugin.getLogger().info(MessageFormat.format("Expiring request from {0}", sender));
                 _requests.remove(sender);
-                _scheduler.runTask(_plugin, () -> expiredRequest(sender, request.getReceiver()));
+                _scheduler.runTask(_plugin, () -> expiredRequest(sender, request.getTarget()));
             }
         }
 
         _scheduler.runTaskLater(_plugin, this::processRequests, 1);
     }
 
-    private void acceptRequest(TeleportRequest teleportRequest) {
+    protected void acceptRequest(TeleportRequest teleportRequest) {
         Player senderPlayer = _plugin.getServer().getPlayer(teleportRequest.getSender());
-        Player receiverPlayer = _plugin.getServer().getPlayer(teleportRequest.getReceiver());
+        Player receiverPlayer = _plugin.getServer().getPlayer(teleportRequest.getTarget());
         if (senderPlayer == null) {
             // If the sender is offline, let the receiver know.
             OfflinePlayer offlineSender = Bukkit.getOfflinePlayer(teleportRequest.getSender());
@@ -152,16 +163,16 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
             return;
         } else if (receiverPlayer == null) {
             // If the receiver is offline, let the sender know.
-            OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(teleportRequest.getReceiver());
+            OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(teleportRequest.getTarget());
             senderPlayer.sendMessage(_localizationHandler.getPlayerWentOffline(offlineReceiver.getName()));
             return;
         }
 
         // Try teleporting the sender to the receiver.
         if (teleportRequest instanceof TeleportHereRequest) {
-            teleport(receiverPlayer, senderPlayer.getLocation(), -1);
+            delay(receiverPlayer, -1, senderPlayer::getLocation, location -> teleport(receiverPlayer, location));
         } else {
-            teleport(senderPlayer, receiverPlayer.getLocation(), -1);
+            delay(senderPlayer, -1, receiverPlayer::getLocation, location -> teleport(senderPlayer, location));
         }
     }
 
@@ -223,7 +234,7 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
 
         // Cancel the TPA request the player has sent
         TeleportRequest request = cancel(playerId);
-        if (request != null && server.getPlayer(request.getReceiver()) instanceof Player sender) {
+        if (request != null && server.getPlayer(request.getTarget()) instanceof Player sender) {
             sender.sendMessage(_localizationHandler.getPlayerWentOffline(playerName));
         }
 

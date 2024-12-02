@@ -3,10 +3,10 @@ package com.four_year_smp.four_tpa.teleport;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import org.bukkit.Bukkit;
+import java.util.function.Consumer;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import com.four_year_smp.four_tpa.FourTpaPlugin;
 import com.four_year_smp.four_tpa.LocalizationHandler;
@@ -21,32 +21,37 @@ public final class FoliaTeleportManager extends PaperTeleportManager {
     }
 
     @Override
-    public void teleport(Player player, Location location, int delay) {
+    public void delay(Player player, int delay, Callable<Location> grabLocation, Consumer<Location> callback) {
         // Default value support since JAVA CAN'T HAVE DEFAULT VALUES FOR FUNCTION PARAMETERS
         // What even is this programming language man - A C# dev
         if (delay == -1) {
-            delay = _plugin.getConfig().getInt("tpa_delay", 0);
+            delay = _plugin.getConfig().getInt("tpa_delay", 0) * 20;
         }
 
-        // If the delay is 0, teleport the player immediately.
-        if (delay == 0 || player.hasPermission("fourtpa.instant")) {
-            player.getScheduler().run(_plugin, task -> {
-                _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
-                _lastLocations.put(player.getUniqueId(), player.getLocation());
-
-                _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
-                player.teleportAsync(location);
-            }, null);
-
-            return;
+        // If the delay is less than one second, teleport the player
+        if (delay < 20 || player.hasPermission("fourtpa.instant")) {
+            try {
+                callback.accept(grabLocation.call());
+            } catch (Exception e) {
+                _plugin.getLogger().warning(MessageFormat.format("Failed to grab location for {0}: {1}", player.getUniqueId(), e.getMessage()));
+            }
         }
 
         // Otherwise count down and teleport the player after the delay
-        player.sendActionBar(_localizationHandler.getTeleportDelayMessage(delay));
+        player.sendActionBar(_localizationHandler.getTeleportDelayMessage(delay / 20));
 
         // Delay is in ticks and there's 20 ticks in a second...
-        final int nextDelay = delay - 1;
-        _scheduler.runDelayed(_plugin, task -> teleport(player, location, nextDelay), nextDelay, TimeUnit.SECONDS);
+        final int nextDelay = delay - 20;
+        player.getScheduler().runDelayed(_plugin, task -> delay(player, nextDelay, grabLocation, callback), null, 20);
+    }
+
+    @Override
+    public void teleport(Player player, Location location) {
+        _plugin.getLogger().info(MessageFormat.format("Storing last location for {0}: {1}", player.getUniqueId(), player.getLocation()));
+        _lastLocations.put(player.getUniqueId(), player.getLocation());
+
+        _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
+        player.teleportAsync(location);
     }
 
     @Override
@@ -69,33 +74,10 @@ public final class FoliaTeleportManager extends PaperTeleportManager {
             } else if (request.hasExpired(getTimeout() * 1000)) {
                 _plugin.getLogger().info(MessageFormat.format("Expiring request from {0}", sender));
                 _requests.remove(sender);
-                _scheduler.runNow(_plugin, task -> expiredRequest(sender, request.getReceiver()));
+                _scheduler.runNow(_plugin, task -> expiredRequest(sender, request.getTarget()));
             }
         }
 
         _scheduler.runDelayed(_plugin, task -> processRequests(), 200, TimeUnit.MILLISECONDS);
-    }
-
-    private void acceptRequest(TeleportRequest request) {
-        Player senderPlayer = _plugin.getServer().getPlayer(request.getSender());
-        Player receiverPlayer = _plugin.getServer().getPlayer(request.getReceiver());
-        if (senderPlayer == null) {
-            // If the sender is offline, let the receiver know.
-            OfflinePlayer offlineSender = Bukkit.getOfflinePlayer(request.getSender());
-            receiverPlayer.sendMessage(_localizationHandler.getPlayerWentOffline(offlineSender.getName()));
-            return;
-        } else if (receiverPlayer == null) {
-            // If the receiver is offline, let the sender know.
-            OfflinePlayer offlineReceiver = Bukkit.getOfflinePlayer(request.getReceiver());
-            senderPlayer.sendMessage(_localizationHandler.getPlayerWentOffline(offlineReceiver.getName()));
-            return;
-        }
-
-        // Try teleporting the sender to the receiver.
-        if (request instanceof TeleportHereRequest) {
-            senderPlayer.getScheduler().run(_plugin, task -> teleport(receiverPlayer, senderPlayer.getLocation(), -1), null);
-        } else {
-            receiverPlayer.getScheduler().run(_plugin, task -> teleport(senderPlayer, receiverPlayer.getLocation(), -1), null);
-        }
     }
 }
