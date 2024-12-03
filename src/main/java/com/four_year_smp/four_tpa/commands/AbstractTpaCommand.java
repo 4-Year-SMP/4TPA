@@ -51,6 +51,12 @@ public abstract class AbstractTpaCommand implements CommandExecutor {
 
     public Player getPlayerOrFailWithMessage(Server server, Player player, String targetName) {
         if (server.getPlayerExact(targetName) instanceof Player target) {
+            // Check to see if SayanVanish is installed
+            if (!server.getPluginManager().isPluginEnabled("SayanVanish")) {
+                return target;
+            }
+
+            // Check to see if the target is vanished
             SayanVanishAPI<User> api = SayanVanishAPI.getInstance();
             User playerUser = api.getUser(player.getUniqueId());
             User targetUser = api.getUser(target.getUniqueId());
