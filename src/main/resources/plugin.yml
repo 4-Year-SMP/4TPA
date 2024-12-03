@@ -5,7 +5,7 @@ folia-supported: true
 main: com.four_year_smp.four_tpa.FourTpaPlugin
 name: 4TPA
 prefix: 4TPA
-softdepend: [SayanVanish]
+softdepend: [GSit, SayanVanish]
 version: 1.2.0
 website: https://github.com/OoLunar/4TPA
 

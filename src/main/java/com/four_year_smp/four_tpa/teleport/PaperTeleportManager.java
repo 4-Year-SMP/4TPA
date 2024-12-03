@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +21,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.scheduler.BukkitScheduler;
 import com.four_year_smp.four_tpa.FourTpaPlugin;
 import com.four_year_smp.four_tpa.LocalizationHandler;
+import io.papermc.paper.entity.TeleportFlag;
 
 public class PaperTeleportManager implements ITeleportManager, Listener {
     private final BukkitScheduler _scheduler;
@@ -117,7 +119,19 @@ public class PaperTeleportManager implements ITeleportManager, Listener {
         _lastLocations.put(player.getUniqueId(), player.getLocation());
 
         _plugin.logDebug(MessageFormat.format("Teleporting {0} to {1}", player.getUniqueId(), location));
-        player.teleport(location);
+
+        Entity vehicle = player.getVehicle();
+        if (vehicle == null) {
+            // If the player is at the bottom of the player stack, teleport the player.
+            player.teleport(location, TeleportCause.COMMAND, TeleportFlag.EntityState.RETAIN_OPEN_INVENTORY, TeleportFlag.EntityState.RETAIN_PASSENGERS);
+        } else if (vehicle instanceof Player) {
+            // If the player is riding another player, teleport just the player instead of the entire player
+            // stack or part of the player stack.
+            player.teleport(location, TeleportCause.COMMAND, TeleportFlag.EntityState.RETAIN_OPEN_INVENTORY);
+        } else {
+            // If the player is on something else (say, a horse), teleport the player and the vehicle.
+            player.teleport(location, TeleportCause.COMMAND, TeleportFlag.EntityState.RETAIN_OPEN_INVENTORY, TeleportFlag.EntityState.RETAIN_PASSENGERS, TeleportFlag.EntityState.RETAIN_VEHICLE);
+        }
     }
 
     public Location getLastLocation(UUID playerId) {

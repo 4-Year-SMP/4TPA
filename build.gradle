@@ -18,11 +18,15 @@ repositories {
     maven {
         url "https://repo.sayandev.org/snapshots"
     }
+    maven {
+        url "https://jitpack.io"
+    }
 }
 
 dependencies {
     compileOnly "org.sayandev:sayanvanish-api:1.6.0"
     compileOnly "io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT"
+    compileOnly "com.github.Gecolay:GSit:1.12.0"
 }
 
 def targetJavaVersion = 21
